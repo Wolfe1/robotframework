@@ -21,7 +21,7 @@ from robot.utils import get_error_message, FileReader
 from .blocklexers import FileLexer
 from .context import InitFileContext, TestCaseFileContext, ResourceFileContext
 from .tokenizer import Tokenizer
-from .tokens import EOS, Token
+from .tokens import EOS, END, Token
 
 
 def get_tokens(source, data_only=False, tokenize_variables=False):
@@ -121,6 +121,7 @@ class Lexer(object):
         name_types = (Token.TESTCASE_NAME, Token.KEYWORD_NAME)
         separator_type = Token.SEPARATOR
         eol_type = Token.EOL
+        statements = self._handle_inline_ifs(statements)
         for statement in statements:
             name_seen = False
             separator_after_name = None
@@ -182,3 +183,57 @@ class Lexer(object):
         for token in tokens:
             for t in token.tokenize_variables():
                 yield t
+
+    def _handle_inline_ifs(self, statements):
+        for statement in statements:
+            if not self._is_if_statement(statement):
+                yield statement
+            elif self._is_normal_if_header(statement):
+                yield statement
+            else:
+                next_statement = []
+                if_seen = False
+                first_if_seen = False
+                expext_kw = False
+                for token in statement:
+                    if token.type == Token.ARGUMENT:
+                        if token.value == 'ELSE':
+                            token.type = Token.ELSE
+                        if token.value == 'ELSE IF':
+                            token.type = Token.ELSE_IF
+                    if expext_kw:
+                        token.type = Token.KEYWORD
+                        expext_kw = False
+                        next_statement.append(token)
+                    elif if_seen:
+                        next_statement.append(token)
+                        yield next_statement
+                        next_statement = []
+                        if_seen = False
+                        expext_kw = True
+                    elif token.type in (Token.IF, Token.ELSE_IF):
+                        if first_if_seen:
+                            yield (next_statement)
+                            next_statement = []
+                        next_statement.append(token)
+                        if_seen = True
+                        first_if_seen = True
+                    elif token.type is Token.ELSE:
+                        yield next_statement
+                        yield [token]
+                        next_statement = []
+                        expext_kw = True
+                    else:
+                        next_statement.append(token)
+                yield next_statement
+                yield [END.from_token(next_statement[-1])]
+
+    def _is_if_statement(self, statement):
+        for token in statement:
+            if token.type == Token.IF:
+                return True
+        return False
+
+    def _is_normal_if_header(self, statement):
+        if_index = [s.type for s in statement].index(Token.IF)
+        return len(statement[if_index:]) <= 2
