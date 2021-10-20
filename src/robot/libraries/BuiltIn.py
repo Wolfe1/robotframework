@@ -2853,6 +2853,11 @@ class _Misc(_BuiltInBase):
         that there is one item per row. For more details see `String
         representations`.
 
+        The old way to control string representation was using the ``repr``
+        argument, and ``repr=True`` is still equivalent to using
+        ``formatter=repr``. The ``repr`` argument will be deprecated in the
+        future, though, and using ``formatter`` is thus recommended.
+
         Examples:
         | Log | Hello, world!        |          |   | # Normal INFO message.   |
         | Log | Warning, world!      | WARN     |   | # Warning.               |
@@ -2865,7 +2870,11 @@ class _Misc(_BuiltInBase):
         See `Log Many` if you want to log multiple messages in one go, and
         `Log To Console` if you only want to write to the console.
         """
-        formatter = self._get_formatter(formatter)
+        # FIXME: Deprecate `repr` in RF 5.
+        if repr:
+            formatter = prepr
+        else:
+            formatter = self._get_formatter(formatter)
         message = formatter(message)
         logger.write(message, level, html)
         if console:
