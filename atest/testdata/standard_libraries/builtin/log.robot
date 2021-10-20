@@ -88,7 +88,7 @@ formatter=str
     ${nfd} =    Evaluate    'hyva\u0308'
     Log    ${nfd}    formatter=str
 
-formatter=slen
+formatter=len
     [Setup]    Set Log Level    DEBUG
     Log    Nothing special here    formatter=len
     Log    Hyvää yötä \u2603!    formatter=LEN
@@ -97,6 +97,16 @@ formatter=slen
     Log    ${bytes}    formatter=len    console=True
     ${nfd} =    Evaluate    'test'
     Log    ${nfd}    formatter=len
+
+formatter=type
+    [Setup]    Set Log Level    DEBUG
+    Log    Nothing special here    formatter=type
+    Log    Hyvää yötä \u2603!    formatter=TYPE
+    Log    ${42}    DEBUG    ${FALSE}    ${FALSE}    ${TRUE}
+    ${bytes} =    Evaluate    b'\\x00abc\\xff (formatter=type)'
+    Log    ${bytes}    formatter=type    console=True
+    ${nfd} =    Evaluate    'test'
+    Log    ${nfd}    formatter=type
 
 formatter=repr pretty prints
     ${long string} =    Evaluate    ' '.join(['Robot Framework'] * 1000)

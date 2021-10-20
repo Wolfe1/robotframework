@@ -91,6 +91,15 @@ formatter=len
     Check Log Message    ${tc.kws[6].msgs[0]}    'hyva\\u0308'
     Stdout Should Contain    b'\\x00abc\\xff (formatter=len)'
 
+formatter=type
+    ${tc} =    Check Test Case    ${TEST NAME}
+    Check Log Message    ${tc.kws[0].msgs[0]}    'Nothing special here'
+    Check Log Message    ${tc.kws[1].msgs[0]}    'Hyv\\xe4\\xe4 y\\xf6t\\xe4 \\u2603!'
+    Check Log Message    ${tc.kws[2].msgs[0]}    {'type': 'string'}    DEBUG
+    Check Log Message    ${tc.kws[4].msgs[0]}    test (formatter=type)'
+    Check Log Message    ${tc.kws[6].msgs[0]}    'hyva\\u0308'
+    Stdout Should Contain    b'\\x00abc\\xff (formatter=type)'
+
 formatter=str
     ${tc} =    Check Test Case    ${TEST NAME}
     Check Log Message    ${tc.kws[0].msgs[0]}    Nothing special here
