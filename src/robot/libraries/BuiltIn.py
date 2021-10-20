@@ -365,7 +365,7 @@ class _Converter(_BuiltInBase):
                 ordinals = getattr(self, '_get_ordinals_from_%s' % input_type)
             except AttributeError:
                 raise RuntimeError("Invalid input type '%s'." % input_type)
-            return bytes(bytearray(o for o in ordinals(input)))
+            return bytes(bytearray(iter(ordinals(input))))
         except:
             raise RuntimeError("Creating bytes failed: %s" % get_error_message())
 
@@ -1004,19 +1004,19 @@ class _Verify(_BuiltInBase):
             if is_string(container):
                 container = container.lower()
             elif is_list_like(container):
-                container = set(x.lower() if is_string(x) else x for x in container)
+                container = {x.lower() if is_string(x) else x for x in container}
         if strip_spaces and is_string(item):
             item = self._strip_spaces(item, strip_spaces)
             if is_string(container):
                 container = self._strip_spaces(container, strip_spaces)
             elif is_list_like(container):
-                container = set(self._strip_spaces(x, strip_spaces) for x in container)
+                container = {self._strip_spaces(x, strip_spaces) for x in container}
         if collapse_spaces and is_string(item):
             item = self._collapse_spaces(item)
             if is_string(container):
                 container = self._collapse_spaces(container)
             elif is_list_like(container):
-                container = set(self._collapse_spaces(x) for x in container)
+                container = {self._collapse_spaces(x) for x in container}
         if item in container:
             raise AssertionError(self._get_string_msg(orig_container, item, msg,
                                                       values, 'contains'))
@@ -1060,19 +1060,19 @@ class _Verify(_BuiltInBase):
             if is_string(container):
                 container = container.lower()
             elif is_list_like(container):
-                container = set(x.lower() if is_string(x) else x for x in container)
+                container = {x.lower() if is_string(x) else x for x in container}
         if strip_spaces and is_string(item):
             item = self._strip_spaces(item, strip_spaces)
             if is_string(container):
                 container = self._strip_spaces(container, strip_spaces)
             elif is_list_like(container):
-                container = set(self._strip_spaces(x, strip_spaces) for x in container)
+                container = {self._strip_spaces(x, strip_spaces) for x in container}
         if collapse_spaces and is_string(item):
             item = self._collapse_spaces(item)
             if is_string(container):
                 container = self._collapse_spaces(container)
             elif is_list_like(container):
-                container = set(self._collapse_spaces(x) for x in container)
+                container = {self._collapse_spaces(x) for x in container}
         if item not in container:
             raise AssertionError(self._get_string_msg(orig_container, item, msg,
                                                       values, 'does not contain'))
@@ -1115,20 +1115,20 @@ class _Verify(_BuiltInBase):
             if is_string(container):
                 container = container.lower()
             elif is_list_like(container):
-                container = set(x.lower() if is_string(x) else x for x in container)
+                container = {x.lower() if is_string(x) else x for x in container}
         if strip_spaces:
             items = [self._strip_spaces(x, strip_spaces) for x in items]
             if is_string(container):
                 container = self._strip_spaces(container, strip_spaces)
             elif is_list_like(container):
-                container = set(self._strip_spaces(x, strip_spaces) for x in container)
+                container = {self._strip_spaces(x, strip_spaces) for x in container}
         if collapse_spaces:
             items = [self._collapse_spaces(x) for x in items]
             if is_string(container):
                 container = self._collapse_spaces(container)
             elif is_list_like(container):
-                container = set(self._collapse_spaces(x) for x in container)
-        if not any(item in container for item in items):
+                container = {self._collapse_spaces(x) for x in container}
+        if all(item not in container for item in items):
             msg = self._get_string_msg(orig_container,
                                        seq2str(items, lastsep=' or '),
                                        msg, values,
@@ -1173,19 +1173,19 @@ class _Verify(_BuiltInBase):
             if is_string(container):
                 container = container.lower()
             elif is_list_like(container):
-                container = set(x.lower() if is_string(x) else x for x in container)
+                container = {x.lower() if is_string(x) else x for x in container}
         if strip_spaces:
             items = [self._strip_spaces(x, strip_spaces) for x in items]
             if is_string(container):
                 container = self._strip_spaces(container, strip_spaces)
             elif is_list_like(container):
-                container = set(self._strip_spaces(x, strip_spaces) for x in container)
+                container = {self._strip_spaces(x, strip_spaces) for x in container}
         if collapse_spaces:
             items = [self._collapse_spaces(x) for x in items]
             if is_string(container):
                 container = self._collapse_spaces(container)
             elif is_list_like(container):
-                container = set(self._collapse_spaces(x) for x in container)
+                container = {self._collapse_spaces(x) for x in container}
         if any(item in container for item in items):
             msg = self._get_string_msg(orig_container,
                                        seq2str(items, lastsep=' or '),
@@ -1891,8 +1891,7 @@ class _RunKeyword(_BuiltInBase):
             for name in self._variables.replace_list(keywords):
                 yield name, ()
         else:
-            for name, args in self._split_run_keywords_from_and(keywords):
-                yield name, args
+            yield from self._split_run_keywords_from_and(keywords)
 
     def _split_run_keywords_from_and(self, keywords):
         while 'AND' in keywords:
@@ -2774,8 +2773,7 @@ class _Misc(_BuiltInBase):
         """
         seconds = timestr_to_secs(time_)
         # Python hangs with negative values
-        if seconds < 0:
-            seconds = 0
+        seconds = max(seconds, 0)
         self._sleep_in_parts(seconds)
         self.log('Slept %s' % secs_to_timestr(seconds))
         if reason:
@@ -2871,10 +2869,7 @@ class _Misc(_BuiltInBase):
         `Log To Console` if you only want to write to the console.
         """
         # FIXME: Deprecate `repr` in RF 5.
-        if repr:
-            formatter = prepr
-        else:
-            formatter = self._get_formatter(formatter)
+        formatter = prepr if repr else self._get_formatter(formatter)
         message = formatter(message)
         logger.write(message, level, html)
         if console:
@@ -2912,8 +2907,7 @@ class _Misc(_BuiltInBase):
             match = search_variable(msg)
             value = self._variables.replace_scalar(msg)
             if match.is_list_variable():
-                for item in value:
-                    yield item
+                yield from value
             elif match.is_dict_variable():
                 for name, value in value.items():
                     yield '%s=%s' % (name, value)
