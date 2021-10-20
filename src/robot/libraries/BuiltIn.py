@@ -2819,7 +2819,7 @@ class _Misc(_BuiltInBase):
         return sep.join(items)
 
     def log(self, message, level='INFO', html=False, console=False,
-            repr=False, formatter='str'):
+            formatter='str'):
         r"""Logs the given message with the given level.
 
         Valid levels are TRACE, DEBUG, INFO (default), HTML, WARN, and ERROR.
@@ -2847,16 +2847,11 @@ class _Misc(_BuiltInBase):
 
         The ``formatter`` argument controls how to format the string
         representation of the message. Possible values are ``str`` (default),
-        ``repr`` and ``ascii``, and they work similarly to Python built-in
-        functions with same names. When using ``repr``, bigger lists,
-        dictionaries and other containers are also pretty-printed so that
-        there is one item per row. For more details see `String
+        ``repr``, ``ascii``, ``len``, and ``type``. They work similarly to
+        Python built-in functions with same names. When using ``repr``, bigger
+        lists, dictionaries and other containers are also pretty-printed so
+        that there is one item per row. For more details see `String
         representations`.
-
-        The old way to control string representation was using the ``repr``
-        argument, and ``repr=True`` is still equivalent to using
-        ``formatter=repr``. The ``repr`` argument will be deprecated in the
-        future, though, and using ``formatter`` is thus recommended.
 
         Examples:
         | Log | Hello, world!        |          |   | # Normal INFO message.   |
@@ -2870,11 +2865,7 @@ class _Misc(_BuiltInBase):
         See `Log Many` if you want to log multiple messages in one go, and
         `Log To Console` if you only want to write to the console.
         """
-        # FIXME: Deprecate `repr` in RF 5.
-        if repr:
-            formatter = prepr
-        else:
-            formatter = self._get_formatter(formatter)
+        formatter = self._get_formatter(formatter)
         message = formatter(message)
         logger.write(message, level, html)
         if console:
@@ -2884,10 +2875,12 @@ class _Misc(_BuiltInBase):
         try:
             return {'str': unic,
                     'repr': prepr,
-                    'ascii': ascii}[formatter.lower()]
+                    'ascii': ascii,
+                    'len': len,
+                    'type': type}[formatter.lower()]
         except KeyError:
             raise ValueError("Invalid formatter '%s'. Available "
-                             "'str', 'repr' and 'ascii'." % formatter)
+                             "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
 
     @run_keyword_variant(resolve=0)
     def log_many(self, *messages):
