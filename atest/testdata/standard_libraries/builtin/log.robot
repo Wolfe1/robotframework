@@ -88,6 +88,16 @@ formatter=str
     ${nfd} =    Evaluate    'hyva\u0308'
     Log    ${nfd}    formatter=str
 
+formatter=slen
+    [Setup]    Set Log Level    DEBUG
+    Log    Nothing special here    formatter=len
+    Log    Hyvää yötä \u2603!    formatter=LEN
+    Log    ${42}    DEBUG    ${FALSE}    ${FALSE}    ${TRUE}
+    ${bytes} =    Evaluate    b'\\x00abc\\xff (formatter=len)'
+    Log    ${bytes}    formatter=len    console=True
+    ${nfd} =    Evaluate    'test'
+    Log    ${nfd}    formatter=len
+
 formatter=repr pretty prints
     ${long string} =    Evaluate    ' '.join(['Robot Framework'] * 1000)
     Log    ${long string}    repr=True
@@ -103,7 +113,7 @@ formatter=repr pretty prints
     Log    ${non ascii}    formatter=repr
 
 formatter=invalid
-    [Documentation]    FAIL ValueError: Invalid formatter 'invalid'. Available 'str', 'repr' and 'ascii'.
+    [Documentation]    FAIL ValueError: Invalid formatter 'invalid'. Available 'str', 'repr', 'ascii', 'len', and 'type'.
     Log    x    formatter=invalid
 
 Log callable
