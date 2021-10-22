@@ -89,7 +89,6 @@ formatter=len
     Check Log Message    ${tc.kws[2].msgs[0]}    42    DEBUG
     Check Log Message    ${tc.kws[4].msgs[0]}    21
     Check Log Message    ${tc.kws[6].msgs[0]}    5
-#    Stdout Should Contain    b'\\x00abc\\xff (formatter=len)'
 
 formatter=type
     ${tc} =    Check Test Case    ${TEST NAME}
@@ -98,7 +97,6 @@ formatter=type
     Check Log Message    ${tc.kws[2].msgs[0]}    42    DEBUG
     Check Log Message    ${tc.kws[4].msgs[0]}    <class 'bytes'>
     Check Log Message    ${tc.kws[6].msgs[0]}    <class 'str'>
-#    Stdout Should Contain    b'\\x00abc\\xff (formatter=type)'
 
 formatter=str
     ${tc} =    Check Test Case    ${TEST NAME}
