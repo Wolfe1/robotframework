@@ -2884,11 +2884,13 @@ class _Misc(_BuiltInBase):
     def _get_formatter(self, formatter):
         try:
             formatter = getattr(sys.modules[__name__], formatter)
+            # formatter = getattr(sys.modules[__name__], formatter)
+            # if isinstance(formatter, (types.ClassType, types.TypeType)):
             if isinstance(formatter.lower(), types.BuiltinFunctionType):
                 if formatter.lower() == 'repr':
                     return prepr
                 return formatter.lower()
-        except KeyError:
+        except (KeyError, AttributeError):
             raise ValueError("Invalid formatter '%s'. Available "
                       "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
 
