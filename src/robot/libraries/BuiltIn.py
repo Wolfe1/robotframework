@@ -2881,7 +2881,8 @@ class _Misc(_BuiltInBase):
             logger.console(message)
 
     def _get_formatter(self, formatter):
-        if isinstance(formatter.lower(), types.BuiltinFunctionType):
+        if formatter.lower in __builtins__.__dict__.values():
+        # if isinstance(formatter.lower(), types.BuiltinFunctionType):
             if formatter.lower() == 'repr':
                 return prepr
             return formatter.lower()
