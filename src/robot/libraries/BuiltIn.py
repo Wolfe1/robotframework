@@ -2882,27 +2882,27 @@ class _Misc(_BuiltInBase):
             logger.console(message)
 
     def _get_formatter(self, formatter):
-        try:
-            formatter = getattr(sys.modules[__name__], formatter.lower())
-            # formatter = getattr(sys.modules[__name__], formatter)
-            # if isinstance(formatter, (types.ClassType, types.TypeType)):
-            if isinstance(formatter, types.BuiltinFunctionType):
-                if formatter == repr:
-                    return prepr
-                return formatter
-        except (KeyError, AttributeError):
-            raise ValueError("Invalid formatter '%s'. Available "
-                      "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
-
         # try:
-        #     return {'str': unic,
-        #             'repr': prepr,
-        #             'ascii': ascii,
-        #             'len': len,
-        #             'type': type}[formatter.lower()]
-        # except KeyError:
+        #     formatter = getattr(sys.modules[__name__], formatter.lower())
+        #     # formatter = getattr(sys.modules[__name__], formatter)
+        #     # if isinstance(formatter, (types.ClassType, types.TypeType)):
+        #     if isinstance(formatter, types.BuiltinFunctionType):
+        #         if formatter == repr:
+        #             return prepr
+        #         return formatter
+        # except (KeyError, AttributeError):
         #     raise ValueError("Invalid formatter '%s'. Available "
-        #                      "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
+        #               "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
+
+        try:
+            return {'str': unic,
+                    'repr': prepr,
+                    'ascii': ascii,
+                    'len': len,
+                    'type': type}[formatter.lower()]
+        except KeyError:
+            raise ValueError("Invalid formatter '%s'. Available "
+                             "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
 
     @run_keyword_variant(resolve=0)
     def log_many(self, *messages):
