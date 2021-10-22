@@ -2888,8 +2888,9 @@ class _Misc(_BuiltInBase):
                 if formatter.lower() == 'repr':
                     return prepr
                 return formatter.lower()
-        raise ValueError("Invalid formatter '%s'. Available "
-                  "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
+        except KeyError:
+            raise ValueError("Invalid formatter '%s'. Available "
+                      "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
 
         # try:
         #     return {'str': unic,
