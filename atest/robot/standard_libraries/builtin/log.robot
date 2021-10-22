@@ -1,6 +1,6 @@
 *** Settings ***
 Suite Setup       Run Tests    ${EMPTY}    standard_libraries/builtin/log.robot
-Resource          ../../../resources/atest_resource.robot
+Resource          atest_resource.robot
 
 *** Variables ***
 ${HTML}           <a href="http://robotframework.org">Robot Framework</a>
