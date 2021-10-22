@@ -95,7 +95,7 @@ formatter=len
     Log    ${42}    DEBUG    ${FALSE}    ${FALSE}    ${TRUE}
     ${bytes} =    Evaluate    b'\\x00abc\\xff (formatter=len)'
     Log    ${bytes}    formatter=len    console=True
-    ${nfd} =    Evaluate    'test'
+    ${nfd} =    Evaluate    'hyva\u0308'
     Log    ${nfd}    formatter=len
 
 formatter=type
@@ -105,7 +105,7 @@ formatter=type
     Log    ${42}    DEBUG    ${FALSE}    ${FALSE}    ${TRUE}
     ${bytes} =    Evaluate    b'\\x00abc\\xff (formatter=type)'
     Log    ${bytes}    formatter=type    console=True
-    ${nfd} =    Evaluate    'test'
+    ${nfd} =    Evaluate    'hyva\u0308'
     Log    ${nfd}    formatter=type
 
 formatter=repr pretty prints
