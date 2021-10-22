@@ -12,8 +12,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-import sys
-import types
 from collections import OrderedDict
 import difflib
 import re
@@ -2882,18 +2880,6 @@ class _Misc(_BuiltInBase):
             logger.console(message)
 
     def _get_formatter(self, formatter):
-        # try:
-        #     formatter = getattr(sys.modules[__name__], formatter.lower())
-        #     # formatter = getattr(sys.modules[__name__], formatter)
-        #     # if isinstance(formatter, (types.ClassType, types.TypeType)):
-        #     if isinstance(formatter, types.BuiltinFunctionType):
-        #         if formatter == repr:
-        #             return prepr
-        #         return formatter
-        # except (KeyError, AttributeError):
-        #     raise ValueError("Invalid formatter '%s'. Available "
-        #               "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
-
         try:
             return {'str': unic,
                     'repr': prepr,
