@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
+import types
 from collections import OrderedDict
 import difflib
 import re
@@ -2881,15 +2881,22 @@ class _Misc(_BuiltInBase):
             logger.console(message)
 
     def _get_formatter(self, formatter):
-        try:
-            return {'str': unic,
-                    'repr': prepr,
-                    'ascii': ascii,
-                    'len': len,
-                    'type': type}[formatter.lower()]
-        except KeyError:
-            raise ValueError("Invalid formatter '%s'. Available "
-                             "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
+        if isinstance(formatter.lower(), types.BuiltinFunctionType):
+            if formatter.lower() == 'repr':
+                return prepr
+            return formatter.lower()
+        raise ValueError("Invalid formatter '%s'. Available "
+                         "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
+
+        # try:
+        #     return {'str': unic,
+        #             'repr': prepr,
+        #             'ascii': ascii,
+        #             'len': len,
+        #             'type': type}[formatter.lower()]
+        # except KeyError:
+        #     raise ValueError("Invalid formatter '%s'. Available "
+        #                      "'str', 'repr', 'ascii', 'len', and 'type'." % formatter)
 
     @run_keyword_variant(resolve=0)
     def log_many(self, *messages):
